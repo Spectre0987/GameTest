@@ -3,55 +3,58 @@ package net.spectre.game;
 import org.lwjgl.opengl.Display;
 
 import net.spectre.game.client.GameRenderer;
-import net.spectre.game.client.Model;
 import net.spectre.game.client.ModelLoader;
+import net.spectre.game.client.models.TexturedModel;
 import net.spectre.game.client.renderer.RenderEngine;
 import net.spectre.game.client.shaders.StaticShader;
+import net.spectre.game.client.textures.TextureMap;
 
 public class Main {
 
-	private static boolean IS_PAUSED = false;
 	private static GameRenderer renderer = new GameRenderer();
 	private static ModelLoader modelLoader = new ModelLoader();
-	private static StaticShader shader;
-	
-	private static Thread clientThread = new Thread("Game Client") {
-
-		@Override
-		public void run() {
-			RenderEngine.startDisplay();
-			shader = new StaticShader();
-			  float[] vert = {
-			    -0.5f, 0.5f, 0f,
-			    -0.5f, -0.5f, 0f,
-			    0.5f, -0.5f, 0f,
-			    0.5f, -0.5f, 0f,
-			    0.5f, 0.5f, 0f,
-			    -0.5f, 0.5f, 0f
-			  };
-			Model test = modelLoader.loadToVAO(vert);
-			shader.bind();
-			
-			while(!Display.isCloseRequested()) {
-				renderer.prepareFrame();
-				shader.bind();
-				renderer.renderModel(test);
-				shader.unbind();
-				RenderEngine.update();
-			}
-			shader.unbind();
-			shader.destroy();
-			modelLoader.clean();
-			RenderEngine.stopDisplay();
-		}
-		
-	};
+	public static StaticShader shader;
+	private static TexturedModel model;
 	
 	public static void main(String[] args) {
-		clientThread.start();
+		RenderEngine.startDisplay();
+		shader = new StaticShader();
+		  float[] vert = {
+		    -0.5F, -0.5F, 0,
+		    0.5F, -0.5F, 0,
+		    0.5F, 0.75F, 0,
+		    -0.5F, 0.75F, 0
+		  };
+		  int[] indices = {
+				  0, 1, 2, 2, 3, 0
+		  };
+		  float[] uvs = {
+				  0, 0,
+				  0, 0.5F,
+				  0.5F, 0.5F,
+				  0.5F, 0
+		  };
+		  
+		TextureMap texture = modelLoader.createTexture("test");
+		model = new TexturedModel(modelLoader.loadToVAO(vert, indices, uvs), texture);
+		
+		while(!Display.isCloseRequested()) {
+			renderer.prepareFrame();
+			render();
+			RenderEngine.update();
+		}
+		shader.destroy();
+		modelLoader.clean();
+		RenderEngine.stopDisplay();
 	}
 	
 	public static void run() {
 		
+	}
+	
+	public static void render() {
+		shader.bind();
+		renderer.renderModel(model);
+		shader.unbind();
 	}
 }

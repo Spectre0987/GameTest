@@ -4,9 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.nio.file.Paths;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 public abstract class Shader {
 
@@ -14,15 +19,19 @@ public abstract class Shader {
 	private int vertexShaderID;
 	private int fragShaderID;
 	
-	public Shader(String vertex, String frag) {
-		vertexShaderID = loadShader(new File("shaders" + File.separator + vertex), GL20.GL_VERTEX_SHADER);
-		fragShaderID = loadShader(new File("shaders" + File.separator + vertex), GL20.GL_FRAGMENT_SHADER);
+	private static FloatBuffer matrixBufferTemp = BufferUtils.createFloatBuffer(16);
+	
+	public Shader(String shader) {
+		vertexShaderID = loadShader(Paths.get("data", "shaders", shader + ".vsh").toFile(), GL20.GL_VERTEX_SHADER);
+		fragShaderID = loadShader(Paths.get("data", "shaders", shader + ".fsh").toFile(), GL20.GL_FRAGMENT_SHADER);
 		
 		id = GL20.glCreateProgram();
 		GL20.glAttachShader(id, vertexShaderID);
 		GL20.glAttachShader(id, fragShaderID);
+		this.bindAttributes();
 		GL20.glLinkProgram(id);
 		GL20.glValidateProgram(id);
+		this.getAllUniformLocations();
 	}
 	
 	protected abstract void bindAttributes();
@@ -64,10 +73,35 @@ public abstract class Shader {
 		int id = GL20.glCreateShader(type);
 		GL20.glShaderSource(id, shader);
 		GL20.glCompileShader(id);
-		if(GL20.glGetShader(id, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-			System.out.println("Shader " + file.getName() + " did nnot compile!");
+		if(GL20.glGetShaderi(id, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
+			System.out.println("Shader " + file.getName() + " did not compile!");
 			System.out.println(GL20.glGetShaderInfoLog(id, 500));
 		}
 		return id;
+	}
+	
+	protected int getUnformVarLocation(String name) {
+		return GL20.glGetUniformLocation(id, name);
+	}
+	
+	protected abstract void getAllUniformLocations();
+	
+	protected void setFloat(int loc, float val) {
+		GL20.glUniform1f(loc, val);
+	}
+	
+	protected void setVector(int loc, Vector3f vec) {
+		GL20.glUniform3f(loc, vec.x, vec.y, vec.z);
+	}
+	
+	public void setBoolean(int loc, boolean val) {
+		GL20.glUniform1i(loc, val ? 1 : 0);
+	}
+	
+	public void setMatrix(int loc, Matrix4f val) {
+		val.store(matrixBufferTemp);
+		matrixBufferTemp.flip();
+		GL20.glUniformMatrix4(loc, false, matrixBufferTemp);
+		//matrixBufferTemp.clear();
 	}
 }

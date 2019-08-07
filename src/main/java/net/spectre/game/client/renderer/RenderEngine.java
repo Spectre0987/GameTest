@@ -14,9 +14,9 @@ public class RenderEngine {
 	
 	public static void startDisplay() {
 		
-		ContextAttribs att = new ContextAttribs(3, 2);
-		att.withForwardCompatible(true);
-		att.withProfileCore(true);
+		ContextAttribs att = new ContextAttribs(3, 2)
+		.withForwardCompatible(true)
+		.withProfileCore(true);
 		
 		try {
 			
@@ -25,7 +25,8 @@ public class RenderEngine {
 			Display.setTitle("Test Game!");
 			Display.setResizable(true);
 			
-		} catch (LWJGLException e) {
+		}
+		catch (LWJGLException e) {
 			e.printStackTrace();
 		}
 		
@@ -36,8 +37,6 @@ public class RenderEngine {
 	public static void update() {
 		Display.sync(FPS);
 		Display.update();
-		
-		
 	}
 	
 	public static void stopDisplay() {
