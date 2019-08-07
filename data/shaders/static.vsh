@@ -5,6 +5,7 @@ layout(location = 0)
 in vec3 position;
 in vec2 textureCoords;
 uniform mat4 transform;
+uniform mat4 projection;
 
 out vec2 passedCoords;
 

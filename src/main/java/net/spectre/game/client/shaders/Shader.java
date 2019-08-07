@@ -102,6 +102,5 @@ public abstract class Shader {
 		val.store(matrixBufferTemp);
 		matrixBufferTemp.flip();
 		GL20.glUniformMatrix4(loc, false, matrixBufferTemp);
-		//matrixBufferTemp.clear();
 	}
 }

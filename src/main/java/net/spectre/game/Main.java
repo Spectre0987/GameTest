@@ -11,7 +11,7 @@ import net.spectre.game.client.textures.TextureMap;
 
 public class Main {
 
-	private static GameRenderer renderer = new GameRenderer();
+	private static GameRenderer renderer;
 	private static ModelLoader modelLoader = new ModelLoader();
 	public static StaticShader shader;
 	private static TexturedModel model;
@@ -19,6 +19,7 @@ public class Main {
 	public static void main(String[] args) {
 		RenderEngine.startDisplay();
 		shader = new StaticShader();
+		renderer = new GameRenderer(shader);
 		  float[] vert = {
 		    -0.5F, -0.5F, 0,
 		    0.5F, -0.5F, 0,
@@ -38,6 +39,7 @@ public class Main {
 		TextureMap texture = modelLoader.createTexture("test");
 		model = new TexturedModel(modelLoader.loadToVAO(vert, indices, uvs), texture);
 		
+		
 		while(!Display.isCloseRequested()) {
 			renderer.prepareFrame();
 			render();
@@ -46,10 +48,6 @@ public class Main {
 		shader.destroy();
 		modelLoader.clean();
 		RenderEngine.stopDisplay();
-	}
-	
-	public static void run() {
-		
 	}
 	
 	public static void render() {

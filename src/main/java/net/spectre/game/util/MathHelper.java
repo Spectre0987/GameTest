@@ -15,4 +15,8 @@ public class MathHelper {
 		Matrix4f.scale(new Vector3f(scale, scale, scale), mat, mat);
 		return mat;
 	}
+
+	public static float clamp(float num, float min, float max) {
+		return num > max ? min : (num < min ? num : num);
+	}
 }
